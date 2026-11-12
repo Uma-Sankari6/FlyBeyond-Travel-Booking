@@ -1,0 +1,109 @@
+
+name: Build and Deploy FlyBeyond
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build & Test with Maven
+        run: mvn clean verify
+
+      - name: Upload WAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: war-file
+          path: target/*.war
+
+  deploy-dev:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download WAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: war-file
+
+      - name: Deploy to DEV
+        env:
+          URL: ${{ secrets.DEV_TOMCAT_URL }}
+          USER: ${{ secrets.DEV_TOMCAT_USERNAME }}
+          PASS: ${{ secrets.DEV_TOMCAT_PASSWORD }}
+        run: |
+          WAR_FILE=$(ls *.war | head -n 1)
+          curl -u "$USER:$PASS" --fail -T "$WAR_FILE" \
+            "$URL/deploy?path=/FlyBeyond&update=true"
+
+  deploy-test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download WAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: war-file
+
+      - name: Deploy to TEST
+        env:
+          URL: ${{ secrets.TEST_TOMCAT_URL }}
+          USER: ${{ secrets.TEST_TOMCAT_USERNAME }}
+          PASS: ${{ secrets.TEST_TOMCAT_PASSWORD }}
+        run: |
+          WAR_FILE=$(ls *.war | head -n 1)
+          curl -u "$USER:$PASS" --fail -T "$WAR_FILE" \
+            "$URL/deploy?path=/FlyBeyond&update=true"
+
+  deploy-pre-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download WAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: war-file
+          path: .
+
+      - name: Deploy to PRE-PROD
+        env:
+          URL: ${{ secrets.PREPROD_TOMCAT_URL }}
+          USER: ${{ secrets.PREPROD_TOMCAT_USERNAME }}
+          PASS: ${{ secrets.PREPROD_TOMCAT_PASSWORD }}
+        run: |
+          WAR_FILE=$(ls *.war | head -n 1)
+          curl -u "$USER:$PASS" --fail -T "$WAR_FILE" \
+            "$URL/deploy?path=/FlyBeyond&update=true"
+
+  deploy-prod:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download WAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: war-file
+          path: .
+
+      - name: Deploy to PROD
+        env:
+          URL: ${{ secrets.PROD_TOMCAT_URL }}
+          USER: ${{ secrets.PROD_TOMCAT_USERNAME }}
+          PASS: ${{ secrets.PROD_TOMCAT_PASSWORD }}
+        run: |
+          WAR_FILE=$(ls *.war | head -n 1)
+          curl -u "$USER:$PASS" --fail -T "$WAR_FILE" \
+            "$URL/deploy?path=/FlyBeyond&update=true"
