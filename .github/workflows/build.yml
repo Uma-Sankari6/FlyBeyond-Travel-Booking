@@ -1,5 +1,5 @@
 
-name: Build Pipeline
+name: FlyBeyond CI CD Pipeline
 
 on:
   push:
@@ -9,16 +9,14 @@ on:
       - pre-prod
       - prod
 
-  pull_request:
-    branches:
-      - dev
-      - test
-      - pre-prod
-      - prod
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  build:
-    name: Maven Build
+  build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -32,5 +30,69 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Build Application
+      - name: Maven Build
         run: mvn clean package
+
+      - name: Find WAR File
+        id: war
+        shell: bash
+        run: |
+          WAR_FILE=$(find target -maxdepth 1 -name '*.war' \
+            -type f | head -n 1)
+          if [ -z "$WAR_FILE" ]; then
+            echo "ERROR: WAR file not found"
+            exit 1
+          fi
+          echo "file=$WAR_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to DEV
+        if: github.ref == 'refs/heads/dev'
+        env:
+          URL: ${{ secrets.DEV_TOMCAT_URL }}
+          USERNAME: ${{ secrets.DEV_TOMCAT_USERNAME }}
+          PASSWORD: ${{ secrets.DEV_TOMCAT_PASSWORD }}
+          WAR: ${{ steps.war.outputs.file }}
+        run: |
+          curl --fail --show-error --silent \
+            --user "$USERNAME:$PASSWORD" \
+            --upload-file "$WAR" \
+            "$URL/deploy?path=/FlyBeyond&update=true"
+
+      - name: Deploy to TEST
+        if: github.ref == 'refs/heads/test'
+        env:
+          URL: ${{ secrets.TEST_TOMCAT_URL }}
+          USERNAME: ${{ secrets.TEST_TOMCAT_USERNAME }}
+          PASSWORD: ${{ secrets.TEST_TOMCAT_PASSWORD }}
+          WAR: ${{ steps.war.outputs.file }}
+        run: |
+          curl --fail --show-error --silent \
+            --user "$USERNAME:$PASSWORD" \
+            --upload-file "$WAR" \
+            "$URL/deploy?path=/FlyBeyond&update=true"
+
+      - name: Deploy to PRE-PROD
+        if: github.ref == 'refs/heads/pre-prod'
+        env:
+          URL: ${{ secrets.PREPROD_TOMCAT_URL }}
+          USERNAME: ${{ secrets.PREPROD_TOMCAT_USERNAME }}
+          PASSWORD: ${{ secrets.PREPROD_TOMCAT_PASSWORD }}
+          WAR: ${{ steps.war.outputs.file }}
+        run: |
+          curl --fail --show-error --silent \
+            --user "$USERNAME:$PASSWORD" \
+            --upload-file "$WAR" \
+            "$URL/deploy?path=/FlyBeyond&update=true"
+
+      - name: Deploy to PROD
+        if: github.ref == 'refs/heads/prod'
+        env:
+          URL: ${{ secrets.PROD_TOMCAT_URL }}
+          USERNAME: ${{ secrets.PROD_TOMCAT_USERNAME }}
+          PASSWORD: ${{ secrets.PROD_TOMCAT_PASSWORD }}
+          WAR: ${{ steps.war.outputs.file }}
+        run: |
+          curl --fail --show-error --silent \
+            --user "$USERNAME:$PASSWORD" \
+            --upload-file "$WAR" \
+            "$URL/deploy?path=/FlyBeyond&update=true"
