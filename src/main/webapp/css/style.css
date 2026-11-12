@@ -1,0 +1,441 @@
+
+/* ==============================
+   FLYBEYOND - COMPLETE CSS
+============================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f5f7fa;
+    color: #263238;
+    min-height: 100vh;
+}
+
+/* NAVIGATION */
+
+.navbar {
+    background: #102a43;
+    color: white;
+    padding: 18px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.logo {
+    color: #ffca5c;
+    font-size: 27px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.navbar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+}
+
+.navbar nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.navbar nav a:hover {
+    color: #ffca5c;
+}
+
+.nav-button {
+    background: #ffca5c;
+    color: #102a43 !important;
+    padding: 10px 17px;
+    border-radius: 5px;
+}
+
+/* HOME BANNER */
+
+.hero {
+    width: 100%;
+    height: 500px;
+    background-image: url("../images/travel-banner.png");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+/* COMMON SECTIONS */
+
+.section {
+    padding: 65px 7%;
+    text-align: center;
+}
+
+.section h2 {
+    font-size: 32px;
+    margin-bottom: 35px;
+    color: #102a43;
+}
+
+/* CARD GRID */
+
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* FEATURE CARDS */
+
+.feature-card {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.08);
+    text-align: center;
+}
+
+.feature-card h3 {
+    margin-bottom: 15px;
+    color: #102a43;
+}
+
+.feature-card p {
+    line-height: 1.7;
+}
+
+/* DESTINATIONS PAGE */
+
+.destinations-section {
+    min-height: 75vh;
+    padding: 55px 7%;
+}
+
+.destination-intro {
+    color: #64748b;
+    font-size: 16px;
+    margin-top: -15px;
+    margin-bottom: 30px;
+}
+
+.destination-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 18px rgba(0,0,0,.09);
+    text-align: left;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.destination-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,.15);
+}
+
+.destination-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+.card-content {
+    padding: 22px;
+}
+
+.destination-card h3 {
+    color: #102a43;
+    font-size: 21px;
+    margin-bottom: 10px;
+}
+
+.destination-country {
+    color: #0077b6;
+    font-weight: bold;
+    margin-bottom: 12px;
+}
+
+.destination-card p {
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.no-destinations {
+    margin-top: 40px;
+    color: #d62828;
+}
+
+/* BUTTONS */
+
+.btn {
+    display: inline-block;
+    background: #ff9f1c;
+    color: #102a43;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #ffbf69;
+}
+
+/* FORMS */
+
+.form-section {
+    min-height: 75vh;
+    padding: 55px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    padding: 35px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 12px;
+    color: #102a43;
+}
+
+.form-container > p {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-container label {
+    display: block;
+    margin: 15px 0 7px;
+    font-weight: bold;
+}
+
+.form-container input,
+.form-container select,
+.form-container textarea,
+.table-container select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.form-container textarea {
+    resize: vertical;
+}
+
+.full-btn {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.form-link {
+    margin-top: 20px;
+}
+
+.form-link a {
+    color: #0077b6;
+}
+
+/* MESSAGES */
+
+.error {
+    color: #d62828;
+    background: #ffe5e5;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 12px 0;
+    text-align: center;
+}
+
+.success {
+    color: #167a36;
+    background: #e0f5e7;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 12px 0;
+    text-align: center;
+}
+
+/* DASHBOARD */
+
+.dashboard-container {
+    width: 100%;
+}
+
+.dashboard-container h1 {
+    margin-bottom: 15px;
+}
+
+/* TABLES */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 25px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    min-width: 750px;
+}
+
+th, td {
+    padding: 14px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #102a43;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f1f5f9;
+}
+
+td form {
+    min-width: 140px;
+}
+
+/* FOOTER */
+
+footer {
+    background: #102a43;
+    color: white;
+    text-align: center;
+    padding: 22px;
+    margin-top: 35px;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 700px) {
+
+    .navbar {
+        flex-direction: column;
+    }
+
+    .navbar nav {
+        justify-content: center;
+    }
+
+    .hero {
+        height: 300px;
+    }
+
+    .form-container {
+        padding: 22px;
+    }
+
+    .section h2 {
+        font-size: 26px;
+    }
+
+    .destination-card img {
+        height: 200px;
+    }
+}
+
+/* BOOKING PAGE */
+
+.booking-section {
+    min-height: 80vh;
+    padding: 60px 20px;
+    background: #f5f7fa;
+}
+
+.booking-container {
+    max-width: 650px;
+    margin: auto;
+    background: white;
+    padding: 40px;
+    border-radius: 14px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.08);
+}
+
+.booking-heading {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.booking-heading span {
+    color: #0077b6;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.booking-heading h1 {
+    color: #102a43;
+    font-size: 32px;
+    margin: 12px 0;
+}
+
+.booking-heading p {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.booking-form label {
+    display: block;
+    font-weight: bold;
+    margin: 18px 0 8px;
+    color: #102a43;
+}
+
+.booking-form input,
+.booking-form select,
+.booking-form textarea {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d5dce5;
+    border-radius: 6px;
+    font-size: 15px;
+    background: white;
+}
+
+.booking-form input:focus,
+.booking-form select:focus,
+.booking-form textarea:focus {
+    outline: none;
+    border-color: #0077b6;
+}
+
+.booking-submit {
+    width: 100%;
+    margin-top: 25px;
+    padding: 15px;
+}
+
+@media (max-width: 600px) {
+    .booking-container {
+        padding: 22px;
+    }
+
+    .booking-heading h1 {
+        font-size: 25px;
+    }
+}
