@@ -1,26 +1,23 @@
 
-name: FlyBeyond CI CD Pipeline
+name: Build and Deploy FlyBeyond
 
 on:
   push:
     branches:
       - dev
-      - test
-      - pre-prod
-      - prod
-
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy
+
+  build:
+    name: Build FlyBeyond
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup Java 17
@@ -31,68 +28,99 @@ jobs:
           cache: maven
 
       - name: Maven Build
-        run: mvn clean package
+        run: mvn clean verify
 
-      - name: Find WAR File
-        id: war
-        shell: bash
-        run: |
-          WAR_FILE=$(find target -maxdepth 1 -name '*.war' \
-            -type f | head -n 1)
-          if [ -z "$WAR_FILE" ]; then
-            echo "ERROR: WAR file not found"
-            exit 1
-          fi
-          echo "file=$WAR_FILE" >> "$GITHUB_OUTPUT"
+      - name: Upload WAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: war-file
+          path: target/*.war
+          if-no-files-found: error
 
-      - name: Deploy to DEV
-        if: github.ref == 'refs/heads/dev'
+  deploy-dev:
+    name: Deploy to DEV
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: war-file
+
+      - name: Deploy DEV
         env:
           URL: ${{ secrets.DEV_TOMCAT_URL }}
-          USERNAME: ${{ secrets.DEV_TOMCAT_USERNAME }}
-          PASSWORD: ${{ secrets.DEV_TOMCAT_PASSWORD }}
-          WAR: ${{ steps.war.outputs.file }}
+          USER: ${{ secrets.DEV_TOMCAT_USERNAME }}
+          PASS: ${{ secrets.DEV_TOMCAT_PASSWORD }}
         run: |
+          WAR_FILE=$(ls *.war | head -n 1)
           curl --fail --show-error --silent \
-            --user "$USERNAME:$PASSWORD" \
-            --upload-file "$WAR" \
+            -u "$USER:$PASS" \
+            -T "$WAR_FILE" \
             "$URL/deploy?path=/FlyBeyond&update=true"
 
-      - name: Deploy to TEST
-        if: github.ref == 'refs/heads/test'
+  deploy-test:
+    name: Deploy to TEST
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: war-file
+
+      - name: Deploy TEST
         env:
           URL: ${{ secrets.TEST_TOMCAT_URL }}
-          USERNAME: ${{ secrets.TEST_TOMCAT_USERNAME }}
-          PASSWORD: ${{ secrets.TEST_TOMCAT_PASSWORD }}
-          WAR: ${{ steps.war.outputs.file }}
+          USER: ${{ secrets.TEST_TOMCAT_USERNAME }}
+          PASS: ${{ secrets.TEST_TOMCAT_PASSWORD }}
         run: |
+          WAR_FILE=$(ls *.war | head -n 1)
           curl --fail --show-error --silent \
-            --user "$USERNAME:$PASSWORD" \
-            --upload-file "$WAR" \
+            -u "$USER:$PASS" \
+            -T "$WAR_FILE" \
             "$URL/deploy?path=/FlyBeyond&update=true"
 
-      - name: Deploy to PRE-PROD
-        if: github.ref == 'refs/heads/pre-prod'
+  deploy-pre-prod:
+    name: Deploy to PRE-PROD
+    needs: deploy-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: war-file
+
+      - name: Deploy PRE-PROD
         env:
           URL: ${{ secrets.PREPROD_TOMCAT_URL }}
-          USERNAME: ${{ secrets.PREPROD_TOMCAT_USERNAME }}
-          PASSWORD: ${{ secrets.PREPROD_TOMCAT_PASSWORD }}
-          WAR: ${{ steps.war.outputs.file }}
+          USER: ${{ secrets.PREPROD_TOMCAT_USERNAME }}
+          PASS: ${{ secrets.PREPROD_TOMCAT_PASSWORD }}
         run: |
+          WAR_FILE=$(ls *.war | head -n 1)
           curl --fail --show-error --silent \
-            --user "$USERNAME:$PASSWORD" \
-            --upload-file "$WAR" \
+            -u "$USER:$PASS" \
+            -T "$WAR_FILE" \
             "$URL/deploy?path=/FlyBeyond&update=true"
 
-      - name: Deploy to PROD
-        if: github.ref == 'refs/heads/prod'
+  deploy-prod:
+    name: Deploy to PROD
+    needs: deploy-pre-prod
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: war-file
+
+      - name: Deploy PROD
         env:
           URL: ${{ secrets.PROD_TOMCAT_URL }}
-          USERNAME: ${{ secrets.PROD_TOMCAT_USERNAME }}
-          PASSWORD: ${{ secrets.PROD_TOMCAT_PASSWORD }}
-          WAR: ${{ steps.war.outputs.file }}
+          USER: ${{ secrets.PROD_TOMCAT_USERNAME }}
+          PASS: ${{ secrets.PROD_TOMCAT_PASSWORD }}
         run: |
+          WAR_FILE=$(ls *.war | head -n 1)
           curl --fail --show-error --silent \
-            --user "$USERNAME:$PASSWORD" \
-            --upload-file "$WAR" \
+            -u "$USER:$PASS" \
+            -T "$WAR_FILE" \
             "$URL/deploy?path=/FlyBeyond&update=true"
